@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+  spark-master:
+    image: apache/spark:3.5.1
+    container_name: spark-master
+    environment:
+      - SPARK_RPC_AUTHENTICATION_SECRET=sparksecret
+      - SPARK_USER=spark
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - spark-net
+    command: "/opt/spark/bin/spark-class org.apache.spark.deploy.master.Master"
+  spark-worker:
+    image: apache/spark:3.5.1
+    container_name: spark-worker
+    environment:
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_RPC_AUTHENTICATION_SECRET=sparksecret
+      - SPARK_USER=spark
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    networks:
+      - spark-net
+    command: "/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077"
+  jupyter:
+    image: jupyter/pyspark-notebook:latest
+    container_name: jupyter
+    environment:
+      - JUPYTER_TOKEN=drproject
+      - PYSPARK_PYTHON=python
+      - PYSPARK_DRIVER_PYTHON=jupyter
+      - PYSPARK_DRIVER_PYTHON_OPTS=lab --LabApp.token=drproject --LabApp.allow_origin='*'
+    volumes:
+      - ../notebooks:/home/jovyan/work/notebooks
+      - ../data:/home/jovyan/work/data
+      - ../src:/home/jovyan/work/src
+      - ../requirements.txt:/home/jovyan/work/requirements.txt
+      - ~/.kaggle:/home/jovyan/.kaggle
+    ports:
+      - "8888:8888"
+    networks:
+      - spark-net
+    depends_on:
+      - spark-master
+      - spark-worker
+    command: bash -c "pip install -r /home/jovyan/work/requirements.txt && start-notebook.sh"
+networks:
+  spark-net:
+    driver: bridge
