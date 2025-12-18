@@ -101,10 +101,6 @@
   - Prints the best parameters found.
   - Prints the final ROC-AUC score of the optimized model on the test set.
 
-### 18. Empty Cell (Cell 18)
-
-- **What it does:** Empty placeholder.
-- **Expected Output:** None.
 
 ### 19. Graph: Class Distribution (Cell 19)
 
@@ -155,7 +151,3 @@
   - **Colors:** Yellow/Green is positive correlation, Purple is negative.
   - **Goal:** Helps spot redundant features or strong predictors.
 
-### 25. Empty Cell (Cell 25)
-
-- **What it does:** Empty placeholder.
-- **Expected Output:** None.
